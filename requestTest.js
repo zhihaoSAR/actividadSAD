@@ -20,6 +20,4 @@ var put = {
       console.log('BODY: ' + chunk);
     });
   });
-  
-  req.write('register/');
   req.end();
