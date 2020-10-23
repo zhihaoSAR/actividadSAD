@@ -3,6 +3,7 @@
 */
 
 var mgdb=require('mongodb');
+const { resolve } = require('path');
 const { rawListeners, exit } = require('process');
 
 var mongoclient = mgdb.MongoClient;
@@ -17,30 +18,36 @@ class Cart{
 
     }
 
-    obtenerProducto(callback)
+    obtenerProductos()
     {
-        mongoclient.connect(this.url,function (err,db) {
-            if (err)
-            {
-                console.log(err);
-                return;
-            }
-            var dbase = db.db("almacen");
-            dbase.collection("productos"). find({}).toArray(function(err, result) { 
-                if (err) {
-                    console.log(err);
-                    return;
-                }
+        return new Promise( (resolve, reject) => {
+            mongoclient.connect(this.url,function (err,db) {
                 
-                callback(result);
-                db.close();
+                    if(err){
+                        reject(err);
+                        return;
+                    }
+                    var dbase = db.db("almacen");
+                    dbase.collection("productos").find({}).toArray(function(err, result) { 
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                    resolve(result);
+                    db.close();
+                });
+                    
+                
+                
             });
         });
     }
-    anyadirCarro(id,producto,callback)
+
+    anyadirCarro(id,producto)
     {
         //comprobar
         let cantidad = 1;
+        let res = false;
         if(this.carro[id])
         {
             cantidad += carro[id]["cantidad"];
@@ -55,17 +62,19 @@ class Cart{
             else{
                 this.carro[id] = {"nombre":producto["nombre"], "cantidad": 1};
             }
-            callback(true);
+            res = true;
         }
-        else{
-            callback(false);
-        }
+        return new Promise((resolve, reject) => {
+                resolve(res);
+        } );
         
     }
-    quitar(id,callback)
+    quitar(id)
     {
         delete this.carro[id];
-        callback();
+        return new Promise((resolve,reject) => {
+            resolve();
+        })
     }
 
 }

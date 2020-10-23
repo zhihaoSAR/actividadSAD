@@ -1,6 +1,8 @@
 const http = require('http');
 const { domainToASCII } = require('url');
 const { type } = require('os');
+const { resolve } = require('path');
+const { rejects } = require('assert');
 const fs = require('fs').promises;
 
 
@@ -17,17 +19,18 @@ const cart = require('./cartService')(url);
 
 var productos=[];
 
-cart.obtenerProducto(function(result) {
+cart.obtenerProductos().then(function(result) {
     for(let producto of result)
     {
         productos[producto.id] = {"nombre": producto["nombre"],
                                     "cantidad": producto["cantidad"] };
     }});
 
-function formalizarDatos(callback){
+function formalizarDatos(){
     datos = "";
-    fs.readFile("./shop.html")
+    return fs.readFile("./shop.html")
         .then(contents => {
+            
             datos = contents.toString();
             //productos
             for(let producto in productos)
@@ -40,10 +43,10 @@ function formalizarDatos(callback){
             {
                 datos+=("<li>"+productos[producto]["nombre"] +" cantidad: "+cart.carro[producto]["cantidad"]+ " <button onclick="+'"{location.href ='+"'/-"+producto+"'"+'}">quitar</button> </li> \n');
             }
-            callback(datos);
-        }).catch(err => {
-            console.log(err);
-        });
+            return new Promise((resolve,reject) => {
+                resolve(datos);
+            });
+        })
 }
 
 function enviarValor(datos,res){
@@ -52,7 +55,7 @@ function enviarValor(datos,res){
     res.end(datos);
 }
 
-function informarAnyadir(quedaStock,datos,callback)
+function informarAnyadir(quedaStock,datos)
 {
     if(quedaStock)
     {
@@ -61,13 +64,15 @@ function informarAnyadir(quedaStock,datos,callback)
     else{
         datos+= "<script>alert('no queda stock')</script>"
     }
-    callback(datos);
+    return new Promise((resolve,rejects) => {
+        resolve(datos);
+    })
 }
 
-function informarQuitar(callback)
+function informarQuitar(datos)
 {
     datos+= "<script>alert('quitado')</script>"
-    callback(datos);
+    return new Promise((resolve,reject) => {resolve(datos)})
 }
 
 
@@ -85,33 +90,26 @@ var requestListener = function (req, res) {
         let id = parseInt(req.url[2])
         if( id <= 5)
         {
-            cart.quitar(id,function(socketRes){
-                return function() {
-                    formalizarDatos( (d1)=>{ informarQuitar( (d2)=>{ enviarValor(d2, socketRes) } ) }  )
-    
-                }
-            }(res)
-            );
+            cart.quitar(id).then(formalizarDatos).then(informarQuitar).then(function(datos){
+                return enviarValor(datos,res);
+            })
         }
         return;
     }
     let id = parseInt(req.url[1])
     if( id <= 5)
     {
-        cart.anyadirCarro(id,productos[id], function(socketRes){
-            return function(anyadido) {
-                formalizarDatos( function (d1){
-                    console.log(anyadido);
-                     informarAnyadir(anyadido,d1, (d2)=>{ enviarValor(d2, socketRes) } ) 
-                    } )
-            }
-        }(res)
-            
-            );
+
+        cart.anyadirCarro(id,productos[id]).then(function(queda){
+            return formalizarDatos().then(function(datos){
+                return informarAnyadir(queda,datos);
+            } )
+        }).then(function(datos){ enviarValor(datos,res)});
+
     }
     else
     {
-        formalizarDatos((d)=>{  enviarValor(d, res) });
+        formalizarDatos().then((datos) => {enviarValor(datos,res)});
         
     }
     
@@ -119,6 +117,6 @@ var requestListener = function (req, res) {
 };
 
 const server = http.createServer(
-    requestListener).listen(80);
+    requestListener).listen(8000);
 
 
