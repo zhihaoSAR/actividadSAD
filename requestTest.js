@@ -2,45 +2,27 @@ const { json } = require('express');
 const http = require('http');
 var put = {
     host: 'localhost',
-    port: 9999,
-    path: '/add/1/product_b/2',
+    port: 9998,
+    path: '/add/0/4',
     method: 'PUT'
   };
   var get = {
     host: 'localhost',
-    port: 3000,
-    path: '/find/mongoAPI/1.0.0',
+    port: 9998,
+    path: '/',
     method: 'GET'
   };
   var post = {
     host: 'localhost',
-    port: 9999,
-    path: '/editar/0/4',
-    method: 'POST'
+    port: 9998,
+    path: '/delete/0',
+    method: 'DELETE'
   };
 
-  var req = http.request(get, function(res) {
+  var req = http.request(put, function(res) {
     res.setEncoding('utf8');
     res.on('data', function (chunk) {
-      inf = JSON.parse(chunk);
-      console.log(typeof(inf.ip))
-      var get2 = {
-        host: inf.ip.split(':').pop().slice(0, -1),
-        port: inf.port,
-        path: '/',
-        method: 'GET'
-      };
-
-      var req = http.request(get2, function(res) {
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-          console.log(chunk)
-          
-        });
-      });
-      req.end();
-
-
+      console.log(chunk)
 
     });
   });

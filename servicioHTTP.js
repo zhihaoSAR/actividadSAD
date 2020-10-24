@@ -15,7 +15,7 @@ exit();
 url+= process.argv[2];
 url+= ":"+process.argv[3]+"/almacen";
 
-const cart = require('./cartService')(url);
+const cart = require('./Cart')(url);
 
 var productos=[];
 

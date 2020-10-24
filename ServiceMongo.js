@@ -41,7 +41,7 @@ const app = express();
   });
    
   app.put('/add/:productoId/:nombre/:cantidad', (req, res) => {
-    productoID = req.params["productoID"]
+    productoID = req.params["productoId"]
     cantidadFinal = req.params["cantidad"]
     productoID = parseInt(productoID)
     cantidadFinal = parseInt(cantidadFinal)
@@ -67,7 +67,7 @@ const app = express();
   });
    
   app.listen(9999, () =>
-    console.log(`Example app listening on port 9999!`),
+    console.log(`Example app listening on port 9999!`)
   );
 
   const http = require('http');

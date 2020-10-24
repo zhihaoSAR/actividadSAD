@@ -1,5 +1,5 @@
 
-
+const http = require('http');
 
 var host = "desconocido"
 var port = 0
@@ -78,24 +78,26 @@ class Cart{
     
 
 
-    _anyadirCarro(producto)
+    comprobarCarro(producto,cant)
     {
         //comprobar
-        let cantidad = 1;
+        let cantidad = cant;
         let res = false;
-        if(this.carro[id])
+        producto = JSON.parse(producto)
+        console.log(cant+" "+producto.cantidad)
+        if(this.carro[producto.id])
         {
-            cantidad += carro[id]["cantidad"];
+            cantidad += this.carro[producto.id]["cantidad"];
         }
-        if(cantidad <= producto["cantidad"] )
+        if(cantidad <= producto.cantidad )
         {
             
-            if(this.carro[id])
+            if(this.carro[producto.id])
             {
-                this.carro[id]["cantidad"]++;
+                this.carro[producto.id]["cantidad"]++;
             }
             else{
-                this.carro[id] = {"nombre":producto["nombre"], "cantidad": 1};
+                this.carro[producto.id] = {"nombre":producto.nombre, "cantidad": 1};
             }
             res = true;
         }
@@ -104,15 +106,34 @@ class Cart{
         } );
         
     }
+    prueba(){
+        console.log("hola")
+    }
     anyadirCarro(producto)
     {
+        let cant = producto.cantidad
         if(host == "desconocido")
         {
-            return buscarMongo().then(()=>{return consultarProducto(producto).then(this._anyadirCarro,
+            
+            return function(cart){ return buscarMongo().then(()=>{
+                
+                return consultarProducto(producto).then(
+                    function(producto){
+                        console.log("consultando")
+                        return cart.comprobarCarro(producto,cant)
+                    }
+                    ,
                                             (err) => { console.error(err); host = "desconocido"  })})
+            }(this)
         }
         else{
-            return consultarProducto(producto).then(this._anyadirCarro,(err) => { console.error(err); host = "desconocido"  })
+            return function(cart){
+                return consultarProducto(producto).then(
+                    function(producto)
+                    {
+                       return cart.comprobarCarro(producto,cant)
+                    },(err) => { console.error(err); host = "desconocido"   })
+            }(this)
         }
     }
     quitar(id)

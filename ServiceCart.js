@@ -7,6 +7,7 @@ console.log("forma de usar node ServiceCart.js hostServiceRegistry puerto");
 process.exit();
 }
 cart = require('./Cart')(process.argv[2],process.argv[3]);
+
 var register = {
     host: process.argv[2],
     port: process.argv[3],
@@ -20,13 +21,13 @@ const app = express();
   });
 
    
-  app.put('/add/:productoId/:nombre/:cantidad', (req, res) => {
-    productoID = req.params["productoID"]
+  app.put('/add/:productoId/:cantidad', (req, res) => {
+    productoID = req.params["productoId"]
     cantidadFinal = req.params["cantidad"]
     productoID = parseInt(productoID)
     cantidadFinal = parseInt(cantidadFinal)
     if(!isNaN(productoID) && !isNaN(cantidadFinal)){
-        return cart.anyadirCarro({id:productoID,nombre:req.params["nombre"],cantidad:cantidadFinal}).then((inf) =>{
+        return cart.anyadirCarro({id:productoID,cantidad:cantidadFinal}).then((inf) =>{
             res.send(inf)
         } )
     }
