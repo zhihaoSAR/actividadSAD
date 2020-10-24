@@ -10,31 +10,22 @@ const productoSchema = new mongoose.Schema({
 
 //var url='mongodb://mongodb:27017/almacen';
 class MongoAPI{
-    constructor(url)
+    constructor()
     {
-        this.url = url;
         mongoose.connect('mongodb://localhost:27017/almacen',{ useNewUrlParser: true })
         this.Product = mongoose.model('Product', productoSchema);
     }
 
-    obtenerProductos(callback)
+    obtenerProductos()
     {
         return this.Product.find().then((result) =>{
-            let productos = [];
-            for(let producto of result)
-            {
-                productos[producto.id] = {"id": producto["id"],"nombre": producto["nombre"],
-                                            "cantidad": producto["cantidad"] };
-            }
-            return new Promise((resolve, reject) =>{ resolve(productos)})
+            return new Promise((resolve) =>{ resolve(result)})
         })
     }
     obtenerProducto(productoID)
     {
         return this.Product.findOne({id: productoID}).then((result) =>{
-            return new Promise((resolve,reject) => {resolve({"id":result.id,
-                                                            "nombre": result.nombre,
-                                                            "cantidad": result.cantidad})})
+            return new Promise((resolve) => {resolve(result)})
         })
     }
     addProduct(producto)
@@ -51,8 +42,8 @@ class MongoAPI{
     }
 }
 
-module.exports =function(url){
-    return new MongoAPI(url);
+module.exports =function(){
+    return new MongoAPI();
 };
 
 
