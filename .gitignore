@@ -3,3 +3,16 @@ mongoose.js
 mongoosePrueba.js
 user.model.js
 mongodb.js
+conf
+conf
+conf
+service-registry/bin/run
+service-registry/config/index.js
+service-registry/eslintrc.js
+service-registry/gitignore
+service-registry/npm-debug.log
+service-registry/package-lock.json
+service-registry/package.json
+service-registry/server/lib/ServiceRegistry.js
+service-registry/server/service.js
+service-registry/vscode/launch.json

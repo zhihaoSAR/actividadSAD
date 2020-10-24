@@ -8,8 +8,8 @@ var put = {
   };
   var get = {
     host: 'localhost',
-    port: 9999,
-    path: '/',
+    port: 3000,
+    path: '/find/mongoAPI/1.0.0',
     method: 'GET'
   };
   var post = {
@@ -19,10 +19,29 @@ var put = {
     method: 'POST'
   };
 
-  var req = http.request(post, function(res) {
+  var req = http.request(get, function(res) {
     res.setEncoding('utf8');
     res.on('data', function (chunk) {
-      console.log(chunk)
+      inf = JSON.parse(chunk);
+      console.log(typeof(inf.ip))
+      var get2 = {
+        host: inf.ip.split(':').pop().slice(0, -1),
+        port: inf.port,
+        path: '/',
+        method: 'GET'
+      };
+
+      var req = http.request(get2, function(res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+          console.log(chunk)
+          
+        });
+      });
+      req.end();
+
+
+
     });
   });
   req.end();

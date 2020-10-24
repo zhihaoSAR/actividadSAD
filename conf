@@ -1,3 +1,4 @@
 #/bin/bash
 export PATH=/home/vagrant/mongodb-linux-x86_64-3.4.9/bin:$PATH
 export NODE_PATH=/home/vagrant/node_modules:
+export PATH=/home/vagrant/node_modules/bunyan/bin:$PATH

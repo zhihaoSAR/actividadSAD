@@ -2,6 +2,12 @@
 express = require('express');
 mongoApi = require('./mongoAPI')();
  
+if(process.argv.length<4)
+{
+console.log("forma de usar node servicioMongo hostServiceRegistry puerto");
+process.exit();
+}
+
 const app = express();
   app.get('/', (req, res) => {
     return mongoApi.obtenerProductos().then((productos) => res.send(productos))
@@ -63,3 +69,21 @@ const app = express();
   app.listen(9999, () =>
     console.log(`Example app listening on port 9999!`),
   );
+
+  const http = require('http');
+var register = {
+    host: process.argv[2],
+    port: process.argv[3],
+    path: '/register/mongoAPI/1.0.0/9999',
+    method: 'PUT'
+  };
+
+  var req = http.request(register, function(res) {
+    console.log('STATUS: ' + res.statusCode);
+    console.log('HEADERS: ' + JSON.stringify(res.headers));
+    res.setEncoding('utf8');
+    res.on('data', function (chunk) {
+      console.log(chunk);
+    });
+  });
+  req.end();
