@@ -22,7 +22,7 @@ var productos=[];
 cart.obtenerProductos().then(function(result) {
     for(let producto of result)
     {
-        productos[producto.id] = {"nombre": producto["nombre"],
+        productos[producto.id] = {"id": producto["id"],"nombre": producto["nombre"],
                                     "cantidad": producto["cantidad"] };
     }});
 
