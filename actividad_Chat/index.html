@@ -3,8 +3,19 @@
   <script>
     function conectar()
     {
-      console.log($('name').val())
       socket.emit('name', $('#name').val());
+    }
+    function escribiendo()
+    {
+      if($('#m').val() =='')
+      {
+        socket.emit('escribiendo', '');
+      }
+      else{
+        socket.emit('escribiendo', 'aa');
+      }
+      
+      
     }
 
 
@@ -24,8 +35,9 @@
   </head>
   <body>
     <ul id="messages"></ul>
+    <div id=escribiendo></div>
     <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
+      <input id="m" autocomplete="off" onkeyup="escribiendo()"/><button>Send</button>
     </form>
     <input id="name" autocomplete="off" /><button onclick="conectar()">Connect</button>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
@@ -40,6 +52,9 @@
       });
       socket.on('chat message', function(msg){
         $('#messages').append($('<li>').text(msg));
+      });
+      socket.on('escribiendo', function(msg){
+        $('#escribiendo').text(msg);
       });
     </script>
   </body>

@@ -6,18 +6,18 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
 });
 
-function sendMsg(msg, user)
+function sendMsg(msg, user,channel = 'chat message')
 {
-  console.log(typeof(clients))
   for(let client in clients)
   {
     if(client != user.id)
     {
       
-      clients[client].socket.emit('chat message', msg)
+      clients[client].socket.emit(channel, msg)
     }
   }
 }
+
 
 io.on('connection', function(socket){
   socket.on('disconnect', function(){
@@ -46,6 +46,22 @@ io.on('connection', function(socket){
     }
      
   });
+
+  socket.on('escribiendo', function(msg){
+    if(clients[socket.id]!= undefined)
+    {
+      if(msg=='')
+      {
+        sendMsg('',socket,'escribiendo')
+      }
+      else{
+        sendMsg(clients[socket.id].name+ ' está escribiendo',socket,'escribiendo')
+      }
+    }
+    
+     
+  });
+
 });
 
 http.listen(3000, function(){
