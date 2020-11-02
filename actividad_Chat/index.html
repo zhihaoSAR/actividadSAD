@@ -1,5 +1,14 @@
 <!doctype html>
 <html>
+  <script>
+    function conectar()
+    {
+      console.log($('name').val())
+      socket.emit('name', $('#name').val());
+    }
+
+
+  </script>
   <head>
     <title>Socket.IO chat</title>
     <style>
@@ -18,12 +27,14 @@
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
+    <input id="name" autocomplete="off" /><button onclick="conectar()">Connect</button>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io();
       $('form').submit(function(){
         socket.emit('chat message', $('#m').val());
+        $('#messages').append($('<li>').text($('#m').val()));
         $('#m').val('');
         return false;
       });

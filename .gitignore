@@ -16,3 +16,4 @@ actividad_Cart/service-registry/package.json
 actividad_Cart/service-registry/server/lib/ServiceRegistry.js
 actividad_Cart/service-registry/server/service.js
 actividad_Cart/service-registry/vscode/launch.json
+actividad_Chat/node_modules
