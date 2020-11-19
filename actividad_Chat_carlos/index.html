@@ -1,0 +1,156 @@
+<html>
+  <head>
+    <title>
+      SAD. Sem Act 3
+    </title>
+    <style>
+      #mainContainer{
+        display: none;}
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <link rel="stylesheet" href="//bootswatch.com/4/flatly/bootstrap.css">
+  </head>
+  <body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+	  <a class="navbar-brand" href="#">Chat con nodejs y express</a>
+	  </nav>
+    <div class="container">
+	<p></p><p></p>
+      <div class="input-group" style="width: 400px; text-align: center; margin: 0 auto;" id="setupContainer">
+	  <p></p>
+        <input id="nickname" class="form-control form-control-lg" type="text" placeholder="Introduce un nombre de usuario">
+          <span class="input-group-btn">
+		 
+            <button class="btn btn-lg btn-primary" type="submit" id="setupNickname">Entrar</button>
+          </span>
+      </div>
+      <div class="alert alert alert-dismissible alert-danger" data-dismiss="alert" id="nickError" style="display: none;">
+        <button type="button" class="close" id="closeAlert">×</button>
+          <strong>El nombre de usuario ya esta en uso.</strong>
+      </div>
+		<div id="mainContainer" class="container" style="height: 56%;">
+			<div class="row">
+				<div id="chatContainer" class="col-lg-6">
+				  <div class="card border-success mb-3" style="max-width: 180rem;">
+					<div class="card-header">Chat</div>
+					<div id="txtChat" class="card-body" style="height: 90%;"></div>
+				  </div>
+				  <div>
+					<form id="escribiendoCont" class="input-group" style="text-align: left; margin: 5 auto;">
+					  <div id="escribiendoData" class="panel-body" style="height: 35px; width: 555px; border: 1px;"></div>
+					</form>
+				  </div>
+				  <div>
+					<form id="sendForm" class="input-group" style="text-align: center; margin: 0 auto;">
+					  <input id="txtMsg" class="form-control form-control-lg" type="text">
+						<span class="input-group-btn">
+						  <button class="btn btn-lg btn-primary" type="submit">Enviar</button>
+						</span>
+					</form>
+				  </div>
+				</div>
+				<div id="usersContainer" class="col-lg-4 offset-lg-1">
+					<div class="bs-component">
+						<div class="form-group">
+							<div class="card text-white bg-success mb-3" style="max-width: 20rem;">
+									<div class="card-header">Usuarios conectados</div>
+									<div id="users" class="card-body"></div>
+							</div>
+						</div>
+						<div class="form-group">
+								<p>Para enviar mensaje personales:</p>
+								<p>/p nickname mensaje</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      jQuery(function($) {
+        var input = document.getElementById('nickname');
+        input.value = "";
+        var input = document.getElementById('txtMsg');
+        input.value = "";
+        var input = document.getElementById('txtChat');
+        input.value = "";
+
+        var socket = io.connect();
+        var $msgForm = $('#sendForm');
+        var $msgInput = $('#txtMsg');
+        var $msgChat = $('#txtChat');
+        var $msgSend = $('#send');
+		
+        var $nickForm = $('#setupNickname');
+        var $nickInput = $('#nickname');
+        var $nickUsers = $('#users');
+        var $nickError = $('#closeAlert');
+        var $escribiendoCont = $('#escribiendoData');
+
+        $nickForm.click(function(e) {
+          e.preventDefault();
+          socket.emit('nuevo usuario', $nickInput.val(), function(data) {
+            if(data) {
+              $('#setupContainer').hide();
+              $('#mainContainer').show();
+            }
+            else {
+              $("#nickError").show();
+            }
+          });
+        });
+
+        $nickError.click(function(e) {
+          $("#nickError").hide();
+        });
+
+        $msgForm.submit(function(e) {
+          e.preventDefault();
+          if($msgInput.val() != '') {
+            $msgChat.append('<b>' + $nickInput.val() + ":</b> " + $msgInput.val() + "<br/>");
+            socket.emit('enviar msg', $msgInput.val());
+          }
+          $msgInput.val('');
+        });
+
+        $msgInput.bind("keypress", () => {
+          socket.emit("escribiendo");
+        });
+
+        socket.on('escribiendo', (data) => {
+          $('#escribiendoData').html('');
+          $escribiendoCont.append(data.nick + " está escribiendo...");
+          setTimeout(function () {
+            $('#escribiendoData').html('');
+          }, 1750);
+        });
+
+        socket.on('nuevo msg', function(data) {
+          $msgChat.append('<b>' + data.nick + ":</b> " + data.msg + "<br/>");
+        });
+
+        socket.on('se conecta', function(data) {
+          $msgChat.append(data.nick + " se ha conectado<br/>"); 
+        });
+
+        socket.on('se desconecta', function(data) {
+          $msgChat.append(data.nick + " se ha desconectado<br/>"); 
+        });
+
+		socket.on('privado', function(data) {
+          $msgChat.append('<b>' + data.nick + ":</b> " + data.msg + "<br/>");
+        });
+
+        socket.on('usuarios', function(data) {
+          var html = '';
+          for(i = 0; i < data.length; i++) {
+            html += data[i] + '<br/>'
+          }
+          $nickUsers.html(html);
+        });
+      });
+    </script>
+  </body>
+</html>
